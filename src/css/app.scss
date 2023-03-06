@@ -1,0 +1,91 @@
+.page {
+  padding: 16px 16px 96px 16px;
+}
+
+.section-container {
+  padding: 16px;
+  background: #ffffff;
+  border-radius: 8px;
+  margin-bottom: 24px;
+}
+
+#app {
+  color: #ffffff;
+  background: linear-gradient(
+    167deg,
+    rgba(200, 158, 229, 1) 0%,
+    rgba(126, 67, 167, 1) 100%
+  );
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  .zaui-routes {
+    flex: 1;
+
+    .zaui-routes-item {
+      display: flex;
+      overflow-x: auto;
+
+      .zaui-page {
+        min-height: 0;
+        height: auto;
+        flex: 1;
+      }
+    }
+  }
+  .zaui-bottom-navigation {
+    .zaui-bottom-navigation-content {
+      height: 60px;
+      background-color: #7e43a7;
+      .zaui-bottom-navigation-item {
+        color: #000;
+      }
+      .zaui-bottom-navigation-item-active {
+        color: #ffffff;
+      }
+    }
+  }
+}
+
+.change-info {
+  width: 100%;
+  padding: 10px;
+  .zaui-list {
+    .zaui-list-item:not(:last-child) {
+      margin-bottom: 0px;
+    }
+  }
+}
+
+.zaui-box {
+  padding: 6px 10px;
+
+  .zaui-input-affix-wrapper,
+  .zaui-input-affix-wrapper-focused {
+    border: none;
+    height: 34px;
+
+    .zaui-input {
+      height: 100%;
+      border-radius: 8px;
+    }
+
+    .zaui-input-search[value]:not([value=""]) {
+      border-radius: 8px 0 0 8px;
+    }
+
+    .zaui-input-suffix {
+      height: 100%;
+      background-color: white;
+      border-radius: 0 8px 8px 0;
+    }
+  }
+}
+
+.zaui-page,
+.zaui-routes-item,
+.no-scrollbar {
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
