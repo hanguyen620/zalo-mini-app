@@ -42,6 +42,7 @@ export default function NavFooter() {
 
   return (
     <>
+      {/* <h1>Hello World</h1> */}
       <BottomNavigation
         id="bottom-nav"
         activeKey={activeTab}

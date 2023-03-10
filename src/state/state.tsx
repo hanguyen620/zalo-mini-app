@@ -9,3 +9,8 @@ export const hasMusicState = atom({
   key: "addMusic",
   default: [],
 });
+
+export const activeContactState = atom({
+  key: "activePlaylist",
+  default: null,
+});

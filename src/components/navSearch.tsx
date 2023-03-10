@@ -4,13 +4,14 @@ import { Box, Page, Input, Icon, Text } from "zmp-ui";
 
 import { popularMusic } from "../state/models";
 import { hasSearchState } from "../state/state";
-import { MusicStore } from "../state/store";
+import { musicApi } from "../state/store";
 
 export default function SearchMusic() {
+  const music = musicApi();
   const [isSearch, setIsSearch] = useRecoilState(hasSearchState);
   const [searching, setSearching] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { musicList } = MusicStore();
+  const { musicList } = music.musicStore();
 
   const [musicName, setMusicName] = useState<popularMusic[]>([]);
 
@@ -51,7 +52,11 @@ export default function SearchMusic() {
     <Page className="fixed">
       <Box
         className="items-center justify-center"
-        style={{ display: "flex", color: "white", background: "#ad68db" }}
+        style={{
+          display: "flex",
+          color: "white",
+          background: "#ad68db",
+        }}
       >
         <Input.Search
           label="Label"
@@ -66,6 +71,7 @@ export default function SearchMusic() {
             search(text);
           }}
           className="input-search"
+          style={{ border: "none" }}
         />
         <div className="ml-4" onClick={() => setIsSearch(false)}>
           Đóng

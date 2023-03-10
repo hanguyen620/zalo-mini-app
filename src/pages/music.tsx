@@ -1,13 +1,64 @@
-import React, { useRef, useState } from "react";
-import { Page, Icon, Sheet, Box, Text, Button, Input } from "zmp-ui";
+import React, { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useRecoilState } from "recoil";
+import {
+  Page,
+  Icon,
+  Sheet,
+  Box,
+  Text,
+  Button,
+  Input,
+  List,
+  useSnackbar,
+} from "zmp-ui";
 
-import { MusicStore } from "../state/store";
+import { activeContactState } from "../state/state";
+import { musicApi } from "../state/store";
 
 export default function Music() {
+  const navigate = useNavigate();
+  const music = musicApi();
+  const [playList, setPlaylist] = useRecoilState(activeContactState);
   const [sheetVisible, setSheetVisible] = useState(false);
   const [playListName, setPlayListName] = useState("");
-  const sheetRef = useRef<any>(null);
-  const { musicList } = MusicStore();
+  const [eplayList, setEplayList] = useState([]);
+  const { openSnackbar } = useSnackbar();
+  const { musicList } = music.musicStore();
+
+  let defaultImage =
+    "https://play-lh.googleusercontent.com/54v1qfGwv6CsspWLRjCUEfVwg4UX248awdm_ad7eoHFst6pDwPNgWlBb4lRsAbjZhA=w240-h480-rw";
+
+  useEffect(() => {
+    fetchList();
+  }, []);
+
+  function fetchList() {
+    let list = music.getListLocal();
+    if (list !== null) {
+      setEplayList(JSON.parse(list));
+    }
+  }
+
+  function addPlaylist() {
+    if (playListName) {
+      const newPlaylist = { title: `${playListName}`, list: [] };
+      music.addListLocal([...eplayList, newPlaylist]);
+      openSnackbar({
+        text: "Thêm Playlist thành công",
+        type: "success",
+        duration: 1500,
+      });
+      setPlayListName("");
+      fetchList();
+    } else {
+      openSnackbar({
+        text: "Vui lòng nhập tên Playlist",
+        type: "error",
+        duration: 1500,
+      });
+    }
+  }
 
   return (
     <>
@@ -41,13 +92,23 @@ export default function Music() {
               <Button
                 fullWidth
                 variant="secondary"
-                onClick={() => setSheetVisible(false)}
+                onClick={() => {
+                  // localStorage.clear();
+                  setSheetVisible(false);
+                  console.log(eplayList);
+                }}
               >
                 Hủy
               </Button>
             </Box>
             <Box>
-              <Button fullWidth onClick={() => setSheetVisible(false)}>
+              <Button
+                fullWidth
+                onClick={() => {
+                  addPlaylist();
+                  setSheetVisible(false);
+                }}
+              >
                 Tạo
               </Button>
             </Box>
@@ -68,10 +129,16 @@ export default function Music() {
           className="no-scrollbar"
         >
           {musicList.map((music, i) => (
-            <div className="flex px-2 py-2.5 items-start flex-col" key={i}>
-              <img src={music.thumbnail} />
+            <div
+              className="flex px-2 py-2.5 items-start flex-col"
+              key={i}
+              onClick={() => {
+                navigate(`/playmusic`);
+              }}
+            >
+              <img src={music.thumbnail} style={{ borderRadius: "6px" }} />
               <div style={{ width: "180px" }}>
-                <h3 className="text-base">{music.title}</h3>
+                <h3 className="text-base check-title">{music.title}</h3>
                 <span className="text-xs">{music.channelTitle}</span>
               </div>
             </div>
@@ -79,11 +146,12 @@ export default function Music() {
         </div>
         <Page>
           <div
-            className="flex fixed justify-between px-4"
+            className="flex justify-between px-4 py-2"
             style={{ width: "100%" }}
           >
             <h3 className="text-lg font-bold">Playlist cá nhân</h3>
             <Button
+              variant="secondary"
               onClick={() => setSheetVisible(true)}
               style={{
                 backgroundColor: "transparent",
@@ -94,6 +162,36 @@ export default function Music() {
               icon={<Icon icon="zi-plus"></Icon>}
             ></Button>
           </div>
+          {eplayList.length ? (
+            <Page className="px-2.5">
+              {eplayList.map((playlist, i) => (
+                <div
+                  key={i}
+                  className="flex py-1.5"
+                  onClick={() => {
+                    setPlaylist(playlist);
+                    navigate(`/playlist`);
+                  }}
+                >
+                  <img
+                    src={playlist?.list[0] || defaultImage}
+                    style={{
+                      width: "60px",
+                      height: "52px",
+                      marginRight: "10px",
+                      borderRadius: "6px",
+                    }}
+                  />
+                  <div>
+                    <h3>{playlist?.title}</h3>
+                    <span>{playlist?.list.length} bài hát</span>
+                  </div>
+                </div>
+              ))}
+            </Page>
+          ) : (
+            ""
+          )}
         </Page>
       </div>
     </>

@@ -1,6 +1,6 @@
 {
-  "cwd": "/home/quang/Documents/phat-trien-mini-app",
-  "name": "phát triển mini app",
+  "cwd": "/home/quang/Documents/zalo-mini-app",
+  "name": "zalo-mini-app",
   "framework": "react-typescript",
   "cssPreProcessor": "scss",
   "includeTailwind": true,

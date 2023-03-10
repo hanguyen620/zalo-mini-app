@@ -5,14 +5,14 @@ import { useNavigate } from "react-router-dom";
 
 import { hasSearchState, hasMusicState } from "../state/state";
 import SearchMusic from "../components/navSearch";
-import { MusicStore, ShazamStore } from "../state/store";
-import PlayMusic from "./playMusic";
+import { musicApi } from "../state/store";
+import PlayMusic from "../components/playMusic";
 import { popularMusic } from "../state/models";
 
 export default function MusicLists() {
+  const music = musicApi();
   const navigate = useNavigate();
-  const { musicList } = MusicStore();
-  const { shazamList } = ShazamStore();
+  const { musicList } = music.musicStore();
   const [isSearch, setIsSearch] = useRecoilState(hasSearchState);
   const [addMusic, setAddMusic] = useRecoilState<popularMusic[]>(hasMusicState);
 
@@ -50,10 +50,15 @@ export default function MusicLists() {
             <span className="text-center px-2">#{i + 1}</span>
             <img
               src={music?.thumbnail}
-              style={{ width: "60px", height: "52px", marginRight: "10px" }}
+              style={{
+                width: "60px",
+                height: "52px",
+                marginRight: "10px",
+                borderRadius: "6px",
+              }}
             />
             <div>
-              <h3 className="text-base">{music?.title}</h3>
+              <h3 className="text-base check-title">{music?.title}</h3>
               <span className="text-xs">{music?.channelTitle}</span>
             </div>
           </div>

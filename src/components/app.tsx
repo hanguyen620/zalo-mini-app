@@ -9,7 +9,8 @@ import NavFooter from "./navFooter";
 import Language from "../pages/language";
 import Nation from "../pages/nation";
 import Popular from "../pages/popular";
-import PlayMusic from "../pages/playMusic";
+import PlayMusic from "../components/playMusic";
+import PlayList from "../pages/playList";
 
 const MyApp = () => {
   return (
@@ -35,6 +36,7 @@ const MyApp = () => {
                 path="/playmusic"
                 element={<PlayMusic></PlayMusic>}
               ></Route>
+              <Route path="/playlist" element={<PlayList></PlayList>}></Route>
             </AnimationRoutes>
             <NavFooter />
           </ZMPRouter>

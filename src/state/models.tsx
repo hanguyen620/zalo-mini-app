@@ -13,3 +13,8 @@ export interface shazamMusic {
   images: [];
   actions: [];
 }
+
+export interface createList {
+  title: string;
+  list: [];
+}
