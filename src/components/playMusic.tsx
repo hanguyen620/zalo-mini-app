@@ -84,19 +84,28 @@ export default function PlayMusic() {
   }
 
   function addMusic(eplay) {
-    eplay.list.push(playList);
-    mApi.addListLocal([
-      ...eplayList.filter(
-        (newEplay: createList) => newEplay.title !== eplay.title
-      ),
-      eplay,
-    ]);
-    setEditSheetVisible(false);
-    openSnackbar({
-      text: `Đã thêm vào PlayList`,
-      type: "success",
-      duration: 1500,
-    });
+    if (eplay.list.find((ep) => ep.id === playList.id)) {
+      setEditSheetVisible(false);
+      openSnackbar({
+        text: `Bài hát đã có trong PlayList`,
+        type: "error",
+        duration: 1500,
+      });
+    } else {
+      eplay.list.push(playList);
+      mApi.addListLocal([
+        ...eplayList.filter(
+          (newEplay: createList) => newEplay.title !== eplay.title
+        ),
+        eplay,
+      ]);
+      setEditSheetVisible(false);
+      openSnackbar({
+        text: `Đã thêm vào PlayList`,
+        type: "success",
+        duration: 1500,
+      });
+    }
   }
 
   return (

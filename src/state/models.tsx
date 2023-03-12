@@ -16,5 +16,5 @@ export interface shazamMusic {
 
 export interface createList {
   title: string;
-  list: [];
+  list: popularMusic[];
 }

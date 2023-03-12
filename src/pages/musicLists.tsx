@@ -29,10 +29,10 @@ export default function MusicLists() {
   }
 
   function playMusic(music) {
-    if (recentPlay.find((rplay) => rplay?.id === music?.id)) {
+    if (recentPlay.find((rplay: popularMusic) => rplay?.id === music?.id)) {
       mApi.addListRecently([
         music,
-        ...recentPlay.filter((rplay) => rplay?.id !== music?.id),
+        ...recentPlay.filter((rplay: popularMusic) => rplay?.id !== music?.id),
       ]);
     } else {
       mApi.addListRecently([music, ...recentPlay]);
