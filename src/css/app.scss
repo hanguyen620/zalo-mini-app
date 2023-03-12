@@ -92,7 +92,7 @@
 
 .check-title {
   display: -webkit-box;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -116,4 +116,20 @@
   background-color: #00fd0a;
   border: 4px solid #333;
   box-shadow: -407px 0 0 400px #00fa0a;
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+.marquee {
+  width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  animation: marquee 12s linear infinite;
 }

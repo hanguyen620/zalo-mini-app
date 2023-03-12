@@ -26,10 +26,22 @@ function musicApi() {
     return result;
   }
 
+  function getListRecently() {
+    let value = localStorage.getItem("playRecently");
+    return value;
+  }
+
+  function addListRecently(value) {
+    let result = localStorage.setItem("playRecently", JSON.stringify(value));
+    return result;
+  }
+
   return {
     musicStore,
     getListLocal,
     addListLocal,
+    getListRecently,
+    addListRecently,
   };
 }
 

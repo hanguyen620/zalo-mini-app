@@ -12,29 +12,38 @@ import {
   List,
   useSnackbar,
 } from "zmp-ui";
+import { createList, popularMusic } from "../state/models";
 
-import { activeContactState } from "../state/state";
+import { activePlaylist } from "../state/state";
 import { musicApi } from "../state/store";
 
 export default function Music() {
   const navigate = useNavigate();
-  const music = musicApi();
-  const [playList, setPlaylist] = useRecoilState(activeContactState);
+  const mApi = musicApi();
+  const [playList, setPlaylist] = useRecoilState(activePlaylist);
   const [sheetVisible, setSheetVisible] = useState(false);
   const [playListName, setPlayListName] = useState("");
   const [eplayList, setEplayList] = useState([]);
+  const [recentPlay, setRecentPlay] = useState([]);
   const { openSnackbar } = useSnackbar();
-  const { musicList } = music.musicStore();
 
   let defaultImage =
-    "https://play-lh.googleusercontent.com/54v1qfGwv6CsspWLRjCUEfVwg4UX248awdm_ad7eoHFst6pDwPNgWlBb4lRsAbjZhA=w240-h480-rw";
+    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRiPKpwuXr5q-EQRWAIq8vq3zArQ90ZDL0zXw&usqp=CAU";
 
   useEffect(() => {
     fetchList();
+    fetchRecently();
   }, []);
 
+  function fetchRecently() {
+    let list = mApi.getListRecently();
+    if (list != null) {
+      setRecentPlay(JSON.parse(list));
+    }
+  }
+
   function fetchList() {
-    let list = music.getListLocal();
+    let list = mApi.getListLocal();
     if (list !== null) {
       setEplayList(JSON.parse(list));
     }
@@ -43,7 +52,7 @@ export default function Music() {
   function addPlaylist() {
     if (playListName) {
       const newPlaylist = { title: `${playListName}`, list: [] };
-      music.addListLocal([...eplayList, newPlaylist]);
+      mApi.addListLocal([...eplayList, newPlaylist]);
       openSnackbar({
         text: "Thêm Playlist thành công",
         type: "success",
@@ -58,6 +67,20 @@ export default function Music() {
         duration: 1500,
       });
     }
+  }
+
+  function playMusic(music) {
+    if (recentPlay.find((rplay: popularMusic) => rplay?.id === music?.id)) {
+      mApi.addListRecently([
+        music,
+        ...recentPlay.filter((rplay: popularMusic) => rplay?.id !== music?.id),
+      ]);
+    } else {
+      mApi.addListRecently([music, ...recentPlay]);
+    }
+    setPlaylist(music);
+    navigate(`/playmusic`);
+    console.log(music.id);
   }
 
   return (
@@ -81,6 +104,7 @@ export default function Music() {
           <Box>
             <Input
               clearable
+              autoFocus
               type="text"
               value={playListName}
               onChange={(e) => setPlayListName(e.target.value)}
@@ -128,21 +152,41 @@ export default function Music() {
           }}
           className="no-scrollbar"
         >
-          {musicList.map((music, i) => (
-            <div
-              className="flex px-2 py-2.5 items-start flex-col"
-              key={i}
-              onClick={() => {
-                navigate(`/playmusic`);
-              }}
-            >
-              <img src={music.thumbnail} style={{ borderRadius: "6px" }} />
-              <div style={{ width: "180px" }}>
-                <h3 className="text-base check-title">{music.title}</h3>
-                <span className="text-xs">{music.channelTitle}</span>
+          {recentPlay.length ? (
+            recentPlay.map((rPlay: popularMusic, i) => (
+              <div
+                className="flex px-2 py-2.5 items-start flex-col"
+                key={i}
+                onClick={() => playMusic(rPlay)}
+              >
+                <img
+                  src={rPlay?.thumbnail}
+                  style={{
+                    borderRadius: "6px",
+                    width: "180px",
+                    height: "102px",
+                  }}
+                />
+                <div style={{ width: "180px" }}>
+                  <h3 className="text-base check-title">{rPlay?.title}</h3>
+                  <span className="text-xs">{rPlay?.channelTitle}</span>
+                </div>
               </div>
-            </div>
-          ))}
+            ))
+          ) : (
+            <>
+              <div
+                style={{
+                  width: "100%",
+                  textAlign: "center",
+                  margin: "auto",
+                  fontSize: "18px",
+                }}
+              >
+                Chưa có bài hát nào gần đây
+              </div>
+            </>
+          )}
         </div>
         <Page>
           <div
@@ -164,17 +208,22 @@ export default function Music() {
           </div>
           {eplayList.length ? (
             <Page className="px-2.5">
-              {eplayList.map((playlist, i) => (
+              {eplayList.map((playlist: createList, i) => (
                 <div
                   key={i}
                   className="flex py-1.5"
                   onClick={() => {
                     setPlaylist(playlist);
                     navigate(`/playlist`);
+                    console.log(playlist);
                   }}
                 >
                   <img
-                    src={playlist?.list[0] || defaultImage}
+                    src={
+                      playlist?.list[0]
+                        ? playlist?.list[0].thumbnail
+                        : defaultImage
+                    }
                     style={{
                       width: "60px",
                       height: "52px",

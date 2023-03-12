@@ -3,18 +3,44 @@ import { Page, Icon } from "zmp-ui";
 import { useRecoilState } from "recoil";
 import { useNavigate } from "react-router-dom";
 
-import { hasSearchState, hasMusicState } from "../state/state";
+import { hasSearchState, activePlaylist } from "../state/state";
 import SearchMusic from "../components/navSearch";
 import { musicApi } from "../state/store";
 import PlayMusic from "../components/playMusic";
 import { popularMusic } from "../state/models";
 
 export default function MusicLists() {
-  const music = musicApi();
+  const mApi = musicApi();
   const navigate = useNavigate();
-  const { musicList } = music.musicStore();
+  const [playList, setPlaylist] = useRecoilState<popularMusic>(activePlaylist);
+  const { musicList } = mApi.musicStore();
   const [isSearch, setIsSearch] = useRecoilState(hasSearchState);
-  const [addMusic, setAddMusic] = useRecoilState<popularMusic[]>(hasMusicState);
+  const [recentPlay, setRecentPlay] = useState([]);
+
+  useEffect(() => {
+    fetchRecently();
+  }, []);
+
+  function fetchRecently() {
+    let list = mApi.getListRecently();
+    if (list != null) {
+      setRecentPlay(JSON.parse(list));
+    }
+  }
+
+  function playMusic(music) {
+    if (recentPlay.find((rplay) => rplay?.id === music?.id)) {
+      mApi.addListRecently([
+        music,
+        ...recentPlay.filter((rplay) => rplay?.id !== music?.id),
+      ]);
+    } else {
+      mApi.addListRecently([music, ...recentPlay]);
+    }
+    setPlaylist(music);
+    navigate(`/playmusic`);
+    console.log(music.id);
+  }
 
   return isSearch ? (
     <SearchMusic />
@@ -40,14 +66,13 @@ export default function MusicLists() {
         </h1>
         {musicList.map((music, i) => (
           <div
-            className="flex px-2 py-2.5 items-center"
+            className="flex px-2.5 py-2.5 items-center"
             key={music.id}
-            onClick={() => {
-              console.log(music.id);
-              navigate(`/playmusic`);
-            }}
+            onClick={() => playMusic(music)}
           >
-            <span className="text-center px-2">#{i + 1}</span>
+            <p className="text-center px-2">
+              #{i + 1 < 10 ? "0" + (i + 1) : i + 1}
+            </p>
             <img
               src={music?.thumbnail}
               style={{
