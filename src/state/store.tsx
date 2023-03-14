@@ -16,6 +16,18 @@ function musicApi() {
     return { musicList };
   }
 
+  function searchStore(value) {
+    const mApi = FetchData();
+    const [searchList, setSearchList] = useState<popularMusic[]>([]);
+
+    useEffect(() => {
+      mApi.searchMusic(value).then((data) => {
+        setSearchList(data);
+      });
+    }, []);
+    return { searchList };
+  }
+
   function getListLocal() {
     let value = localStorage.getItem("playlist");
     return value;

@@ -14,13 +14,15 @@ import {
 } from "zmp-ui";
 import { createList, popularMusic } from "../state/models";
 
-import { activePlaylist } from "../state/state";
+import { activeMusic, activePlaylist } from "../state/state";
 import { musicApi } from "../state/store";
 
 export default function Music() {
   const navigate = useNavigate();
   const mApi = musicApi();
-  const [playList, setPlaylist] = useRecoilState(activePlaylist);
+  const [playMusic, setPlayMusic] = useRecoilState(activeMusic);
+  const [playList, setPlaylist] = useRecoilState<createList>(activePlaylist);
+
   const [sheetVisible, setSheetVisible] = useState(false);
   const [playListName, setPlayListName] = useState("");
   const [eplayList, setEplayList] = useState([]);
@@ -69,7 +71,7 @@ export default function Music() {
     }
   }
 
-  function playMusic(music) {
+  function playingMusic(music) {
     if (recentPlay.find((rplay: popularMusic) => rplay?.id === music?.id)) {
       mApi.addListRecently([
         music,
@@ -78,7 +80,7 @@ export default function Music() {
     } else {
       mApi.addListRecently([music, ...recentPlay]);
     }
-    setPlaylist(music);
+    setPlayMusic(music);
     navigate(`/playmusic`);
     console.log(music.id);
   }
@@ -157,7 +159,7 @@ export default function Music() {
               <div
                 className="flex px-2 py-2.5 items-start flex-col"
                 key={i}
-                onClick={() => playMusic(rPlay)}
+                onClick={() => playingMusic(rPlay)}
               >
                 <img
                   src={rPlay?.thumbnail}

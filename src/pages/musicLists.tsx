@@ -3,7 +3,7 @@ import { Page, Icon } from "zmp-ui";
 import { useRecoilState } from "recoil";
 import { useNavigate } from "react-router-dom";
 
-import { hasSearchState, activePlaylist } from "../state/state";
+import { hasSearchState, activeMusic } from "../state/state";
 import SearchMusic from "../components/navSearch";
 import { musicApi } from "../state/store";
 import PlayMusic from "../components/playMusic";
@@ -12,7 +12,7 @@ import { popularMusic } from "../state/models";
 export default function MusicLists() {
   const mApi = musicApi();
   const navigate = useNavigate();
-  const [playList, setPlaylist] = useRecoilState<popularMusic>(activePlaylist);
+  const [playMusic, setPlayMusic] = useRecoilState<popularMusic>(activeMusic);
   const { musicList } = mApi.musicStore();
   const [isSearch, setIsSearch] = useRecoilState(hasSearchState);
   const [recentPlay, setRecentPlay] = useState([]);
@@ -28,7 +28,7 @@ export default function MusicLists() {
     }
   }
 
-  function playMusic(music) {
+  function playingMusic(music) {
     if (recentPlay.find((rplay: popularMusic) => rplay?.id === music?.id)) {
       mApi.addListRecently([
         music,
@@ -37,7 +37,7 @@ export default function MusicLists() {
     } else {
       mApi.addListRecently([music, ...recentPlay]);
     }
-    setPlaylist(music);
+    setPlayMusic(music);
     navigate(`/playmusic`);
     console.log(music.id);
   }
@@ -68,7 +68,7 @@ export default function MusicLists() {
           <div
             className="flex px-2.5 py-2.5 items-center"
             key={music.id}
-            onClick={() => playMusic(music)}
+            onClick={() => playingMusic(music)}
           >
             <p className="text-center px-2">
               #{i + 1 < 10 ? "0" + (i + 1) : i + 1}

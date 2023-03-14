@@ -12,7 +12,7 @@ import {
 } from "zmp-ui";
 
 import { createList, popularMusic } from "../state/models";
-import { activePlaylist } from "../state/state";
+import { activePlaylist, activeMusic } from "../state/state";
 import { musicApi } from "../state/store";
 
 export default function PlayList() {
@@ -21,7 +21,9 @@ export default function PlayList() {
   const [editSheetVisible, setEditSheetVisible] = useState(false);
   const [playListName, setPlayListName] = useState("");
   const [eplayList, setEplayList] = useState([]);
+  const [recentPlay, setRecentPlay] = useState([]);
   const [playList, setPlaylist] = useRecoilState<createList>(activePlaylist);
+  const [playMusic, setPlayMusic] = useRecoilState<popularMusic>(activeMusic);
   const navigate = useNavigate();
   const { openSnackbar } = useSnackbar();
 
@@ -30,6 +32,7 @@ export default function PlayList() {
 
   useEffect(() => {
     fetchList();
+    fetchRecently();
   }, []);
 
   function fetchList() {
@@ -37,6 +40,19 @@ export default function PlayList() {
     if (list !== null) {
       setEplayList(JSON.parse(list));
     }
+  }
+
+  function fetchRecently() {
+    let list = mApi.getListRecently();
+    if (list != null) {
+      setRecentPlay(JSON.parse(list));
+    }
+  }
+
+  function randomMusic() {
+    let random = Math.floor(Math.random() * playList.list.length);
+    setPlayMusic(playList.list[random]);
+    navigate(`/playmusic`);
   }
 
   function delPlaylist(list) {
@@ -78,52 +94,101 @@ export default function PlayList() {
     }
   }
 
+  function playingMusic(music) {
+    if (recentPlay.find((rplay: popularMusic) => rplay?.id === music?.id)) {
+      mApi.addListRecently([
+        music,
+        ...recentPlay.filter((rplay: popularMusic) => rplay?.id !== music?.id),
+      ]);
+    } else {
+      mApi.addListRecently([music, ...recentPlay]);
+    }
+    setPlayMusic(music);
+    navigate(`/playmusic`);
+    console.log(music.id);
+  }
+
+  function deleteMusic(music) {
+    const newPlay = {
+      title: playList.title,
+      list: playList.list.filter((e) => e.id !== music.id),
+    };
+    const newList = [
+      ...eplayList.filter((e: popularMusic) => e.title !== playList.title),
+      newPlay,
+    ];
+    setPlaylist(newPlay);
+    openSnackbar({
+      text: "Xóa bài hát thành công",
+      type: "success",
+      duration: 1500,
+    });
+    mApi.addListLocal(newList);
+    navigate(`/playList`);
+  }
+
   return (
     <div className="flex flex-col justify-center items-center px-3.5 py-3 relative">
       <div style={{ width: "90px" }} className="mb-2.5">
-        <img src={defaultImage} style={{ borderRadius: "10px" }} />
+        <img
+          src={
+            playList?.list?.length ? playList.list[0]?.thumbnail : defaultImage
+          }
+          style={{ borderRadius: "10px", width: "90px", height: "90px" }}
+        />
       </div>
       <div className="flex flex-col items-center justify-center">
         <h3 className="text-xl font-bold">{playList.title}</h3>
         <p className="pb-2.5">
           {playList?.list ? playList.list.length : 0} bài hát
         </p>
-        {playList?.list.length ? (
-          ""
+        {playList?.list?.length ? (
+          <Button
+            onClick={() => {
+              randomMusic();
+            }}
+          >
+            Play ngẫu nhiên
+          </Button>
         ) : (
-          <p style={{ textAlign: "center" }}>
-            Sắp xếp các bài hát vào playlist bằng cách tìm kiếm và thêm chúng
-            vào Music pro
-          </p>
+          <>
+            <p style={{ textAlign: "center" }}>
+              Sắp xếp các bài hát vào playlist bằng cách tìm kiếm và thêm chúng
+              vào Music pro
+            </p>
+            <Button
+              onClick={() => {
+                console.log(playList);
+                navigate(`/search`);
+              }}
+              style={{ marginTop: "10px" }}
+            >
+              Tìm kiếm bài hát
+            </Button>
+          </>
         )}
-        <Button
-          onClick={() => {
-            console.log(playList);
-            navigate(`/search`);
-          }}
-        >
-          Tìm kiếm bài
-        </Button>
       </div>
       <div className="mt-5">
         {playList?.list.length ? (
           playList.list.map((pList: popularMusic, i) => (
-            <div key={i} className="flex pb-5">
-              <img
-                src={pList?.thumbnail}
-                style={{
-                  width: "60px",
-                  height: "52px",
-                  marginRight: "10px",
-                  borderRadius: "6px",
-                }}
-              />
-              <div>
-                <h3 className="text-base check-title">{pList?.title}</h3>
-                <span className="text-xs">{pList?.channelTitle}</span>
+            <div className="flex items-center pb-5" key={i}>
+              <div className="flex" onClick={() => playingMusic(pList)}>
+                <img
+                  src={pList?.thumbnail}
+                  style={{
+                    width: "60px",
+                    height: "52px",
+                    marginRight: "10px",
+                    borderRadius: "6px",
+                  }}
+                />
+                <div>
+                  <h3 className="text-base check-title">{pList?.title}</h3>
+                  <span className="text-xs">{pList?.channelTitle}</span>
+                </div>
               </div>
-              <button>
-                <Icon icon="zi-more-vert"></Icon>
+              <button onClick={() => deleteMusic(pList)}>
+                <Icon icon="zi-close"></Icon>
               </button>
             </div>
           ))
@@ -158,9 +223,9 @@ export default function PlayList() {
                 text: "Xóa",
                 onClick: () => {
                   delPlaylist(playList);
+                  console.log(playList);
                 },
                 danger: true,
-                close: true,
               },
             ],
             [{ text: "Hủy", close: true }],

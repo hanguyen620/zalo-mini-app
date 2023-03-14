@@ -15,12 +15,12 @@ import { AiOutlineStepForward, AiOutlineStepBackward } from "react-icons/ai";
 
 import { musicApi } from "../state/store";
 import { createList, popularMusic } from "../state/models";
-import { activePlaylist } from "../state/state";
+import { activeMusic } from "../state/state";
 
 export default function PlayMusic() {
   const mApi = musicApi();
   const { openSnackbar } = useSnackbar();
-  const [playList, setPlaylist] = useRecoilState<popularMusic>(activePlaylist);
+  const [playList, setPlaylist] = useRecoilState<popularMusic>(activeMusic);
   const videoRef = useRef<HTMLIFrameElement>(null);
   const [currentTime, setCurrentTime] = useState(0);
   const [sheetVisible, setSheetVisible] = useState(false);

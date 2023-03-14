@@ -6,6 +6,11 @@ export const hasSearchState = atom({
   default: false,
 });
 
+export const activeMusic = atom<popularMusic | any>({
+  key: "activeMusic",
+  default: null,
+});
+
 export const activePlaylist = atom<popularMusic | any>({
   key: "activePlaylist",
   default: null,
