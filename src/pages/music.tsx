@@ -82,7 +82,7 @@ export default function Music() {
     }
     setPlayMusic(music);
     navigate(`/playmusic`);
-    console.log(music.id);
+    console.log(music);
   }
 
   return (
@@ -119,7 +119,7 @@ export default function Music() {
                 fullWidth
                 variant="secondary"
                 onClick={() => {
-                  // localStorage.clear();
+                  localStorage.clear();
                   setSheetVisible(false);
                   console.log(eplayList);
                 }}
@@ -227,8 +227,8 @@ export default function Music() {
                         : defaultImage
                     }
                     style={{
-                      width: "60px",
-                      height: "52px",
+                      width: "80px",
+                      height: "60px",
                       marginRight: "10px",
                       borderRadius: "6px",
                     }}

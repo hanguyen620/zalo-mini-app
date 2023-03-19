@@ -7,10 +7,11 @@ const FetchData = () => {
   async function getTopMusic() {
     const response = await fetch(urlYoutube);
     const json = await response.json();
-    const items = json.items.map((item) => ({
-      id: item.id,
+    const items = json.items.map((item, i) => ({
+      id: i,
+      mId: item.id,
       title: item.snippet.title,
-      thumbnail: item.snippet.thumbnails.medium.url,
+      thumbnail: item.snippet.thumbnails.default.url,
       videoUrl: `https://www.youtube.com/watch?v=${item.id}`,
       channelTitle: item.snippet.channelTitle,
     }));

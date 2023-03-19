@@ -39,7 +39,7 @@ export default function MusicLists() {
     }
     setPlayMusic(music);
     navigate(`/playmusic`);
-    console.log(music.id);
+    console.log(music);
   }
 
   return isSearch ? (
@@ -76,8 +76,8 @@ export default function MusicLists() {
             <img
               src={music?.thumbnail}
               style={{
-                width: "60px",
-                height: "52px",
+                width: "80px",
+                height: "60px",
                 marginRight: "10px",
                 borderRadius: "6px",
               }}

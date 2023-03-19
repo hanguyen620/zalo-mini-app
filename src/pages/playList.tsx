@@ -111,7 +111,7 @@ export default function PlayList() {
   function deleteMusic(music) {
     const newPlay = {
       title: playList.title,
-      list: playList.list.filter((e) => e.id !== music.id),
+      list: playList.list.filter((e) => e.id !== music.mId),
     };
     const newList = [
       ...eplayList.filter((e: popularMusic) => e.title !== playList.title),
@@ -129,12 +129,12 @@ export default function PlayList() {
 
   return (
     <div className="flex flex-col justify-center items-center px-3.5 py-3 relative">
-      <div style={{ width: "90px" }} className="mb-2.5">
+      <div style={{ width: "120px" }} className="mb-2.5">
         <img
           src={
             playList?.list?.length ? playList.list[0]?.thumbnail : defaultImage
           }
-          style={{ borderRadius: "10px", width: "90px", height: "90px" }}
+          style={{ borderRadius: "10px", width: "120px", height: "90px" }}
         />
       </div>
       <div className="flex flex-col items-center justify-center">
@@ -177,7 +177,7 @@ export default function PlayList() {
                   src={pList?.thumbnail}
                   style={{
                     width: "60px",
-                    height: "52px",
+                    height: "45px",
                     marginRight: "10px",
                     borderRadius: "6px",
                   }}

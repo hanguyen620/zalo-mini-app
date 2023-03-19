@@ -41,13 +41,14 @@ export default function SearchMusic() {
         //     makeSearchText(item?.title).includes(key.toLowerCase()) == true
         // );
         const response = await fetch(
-          `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=10&q=${key}&type=video&key=AIzaSyDzqNIjBx26NL3GBGDPiTqkxzsrqy8FhcA`
+          `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=30&q=${key}&type=video&key=AIzaSyDzqNIjBx26NL3GBGDPiTqkxzsrqy8FhcA`
         );
         const json = await response.json();
-        const items = json.items.map((item) => ({
-          id: item.id.videoId,
+        const items = json.items.map((item, i) => ({
+          mId: item.id.videoId,
+          id: i,
           title: item.snippet.title,
-          thumbnail: item.snippet.thumbnails.medium.url,
+          thumbnail: item.snippet.thumbnails.default.url,
           videoUrl: `https://www.youtube.com/watch?v=${item.id}`,
           channelTitle: item.snippet.channelTitle,
         }));
@@ -73,7 +74,7 @@ export default function SearchMusic() {
     }
     setPlayMusic(music);
     navigate(`/playmusic`);
-    console.log(music.id);
+    // console.log(music);
   }
 
   function makeSearchText(str: string) {
@@ -90,13 +91,14 @@ export default function SearchMusic() {
   }
 
   return (
-    <Page className="fixed">
+    <Page>
       <Box
-        className="items-center justify-center"
+        className="items-center justify-center fixed"
         style={{
           display: "flex",
           color: "white",
           background: "#ad68db",
+          width: "100%",
         }}
       >
         <Input.Search
@@ -121,7 +123,7 @@ export default function SearchMusic() {
       {loading ? (
         <Text className="text-center mt-4">Đang tìm kiếm ...</Text>
       ) : musicName?.length ? (
-        <>
+        <div style={{ marginTop: "54px" }}>
           {musicName.map((music, i) => (
             <div
               className="flex px-4 py-2.5 items-center"
@@ -133,8 +135,8 @@ export default function SearchMusic() {
               <img
                 src={music?.thumbnail}
                 style={{
-                  width: "60px",
-                  height: "52px",
+                  width: "80px",
+                  height: "60px",
                   marginRight: "10px",
                   borderRadius: "6px",
                 }}
@@ -145,7 +147,7 @@ export default function SearchMusic() {
               </div>
             </div>
           ))}
-        </>
+        </div>
       ) : (
         <Text className="text-center mt-4">Không tìm thấy</Text>
       )}

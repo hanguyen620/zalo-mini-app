@@ -1,4 +1,5 @@
 export interface popularMusic {
+  mId: string;
   channelTitle: string;
   id: string;
   thumbnail: string;

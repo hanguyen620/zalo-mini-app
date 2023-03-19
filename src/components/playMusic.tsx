@@ -12,6 +12,7 @@ import {
 } from "zmp-ui";
 import { FaVolumeMute, FaVolumeUp } from "react-icons/fa";
 import { AiOutlineStepForward, AiOutlineStepBackward } from "react-icons/ai";
+import { useNavigate } from "react-router-dom";
 
 import { musicApi } from "../state/store";
 import { createList, popularMusic } from "../state/models";
@@ -19,23 +20,34 @@ import { activeMusic } from "../state/state";
 
 export default function PlayMusic() {
   const mApi = musicApi();
+  const { musicList } = mApi.musicStore();
+  const navigate = useNavigate();
   const { openSnackbar } = useSnackbar();
   const [playList, setPlaylist] = useRecoilState<popularMusic>(activeMusic);
   const videoRef = useRef<HTMLIFrameElement>(null);
-  const [currentTime, setCurrentTime] = useState(0);
   const [sheetVisible, setSheetVisible] = useState(false);
   const [editSheetVisible, setEditSheetVisible] = useState(false);
   const [playListName, setPlayListName] = useState("");
-  const [duration, setDuration] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [eplayList, setEplayList] = useState([]);
   const [volume, setVolume] = useState(50);
+  const [recentPlay, setRecentPlay] = useState([]);
+  const [duration, setDuration] = useState(0);
+  const [currentTime, setCurrentTime] = useState(0);
 
-  const videoUrl = `https://www.youtube.com/embed/${playList?.id}?enablejsapi=1&controls=0&autoplay=1&mute=0&modestbranding=0&rel=0&vq=480`;
+  const videoUrl = `https://www.youtube.com/embed/${playList?.mId}?enablejsapi=1&controls=0&autoplay=1&mute=0&modestbranding=0&rel=0&vq=480`;
 
   useEffect(() => {
     fetchList();
+    fetchRecently();
   }, []);
+
+  function fetchRecently() {
+    let list = mApi.getListRecently();
+    if (list != null) {
+      setRecentPlay(JSON.parse(list));
+    }
+  }
 
   function fetchList() {
     let list = mApi.getListLocal();
@@ -106,6 +118,24 @@ export default function PlayMusic() {
         duration: 1500,
       });
     }
+  }
+
+  function randomMusic() {
+    const ranMusic =
+      musicList[Math.floor(Math.random() * musicList.length).toString()];
+    setPlaylist(ranMusic);
+    if (recentPlay.find((rplay: popularMusic) => rplay?.id === ranMusic?.id)) {
+      mApi.addListRecently([
+        ranMusic,
+        ...recentPlay.filter(
+          (rplay: popularMusic) => rplay?.id !== ranMusic?.id
+        ),
+      ]);
+    } else {
+      mApi.addListRecently([ranMusic, ...recentPlay]);
+    }
+    fetchRecently();
+    // console.log(recentPlay);
   }
 
   return (
@@ -243,9 +273,20 @@ export default function PlayMusic() {
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           ref={videoRef}
         ></iframe>
-        <div className="video-container">
+        <div className="video-container py-6">
+          <div className="flex justify-center items-center">
+            <p className="px-2">00:00</p>
+            <input
+              type="range"
+              min="0"
+              max="100"
+              // value={volume}
+              // onChange={handleVolumeChange}
+            />
+            <p className="px-2">04:30</p>
+          </div>
           <div className="flex justify-center items-center py-6">
-            <button>
+            <button onClick={() => randomMusic()}>
               <AiOutlineStepBackward size={20} />
             </button>
             <button onClick={togglePlay} style={{ padding: "0 10px" }}>
@@ -255,7 +296,7 @@ export default function PlayMusic() {
                 <Icon icon="zi-pause-solid" size={50} />
               )}
             </button>
-            <button>
+            <button onClick={() => randomMusic()}>
               <AiOutlineStepForward size={20} />
             </button>
           </div>
@@ -264,7 +305,6 @@ export default function PlayMusic() {
               <FaVolumeMute style={{ fontSize: "20px" }} />
             </button>
             <input
-              className="range"
               type="range"
               min="0"
               max="100"
